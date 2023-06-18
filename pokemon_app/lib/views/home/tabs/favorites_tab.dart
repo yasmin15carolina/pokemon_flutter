@@ -3,96 +3,39 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mobx/flutter_mobx.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+
 import 'package:pokemon_app/main.dart';
 import 'package:pokemon_app/models/pokemon.dart';
 import 'package:pokemon_app/store/pokemon_store.dart';
-import 'package:pokemon_app/views/favorites_tab.dart';
-import 'package:pokemon_app/views/pokemon_details.view.dart';
+import 'package:pokemon_app/views/pokemon/pokemon_details.view.dart';
+import 'package:pokemon_app/widgets/pokemon_card.dart';
 
-import '../hive/pokemon_hive.dart';
+import '../../../hive/pokemon_hive.dart';
 
-class HomeView extends StatefulWidget {
-  const HomeView({super.key});
+class FavoritesTab extends StatefulWidget {
+  final List<PokemonModel> favorites;
+  const FavoritesTab({
+    Key? key,
+    required this.favorites,
+  }) : super(key: key);
 
   @override
-  State<HomeView> createState() => _HomeViewState();
+  State<FavoritesTab> createState() => _FavoritesTabState();
 }
 
-class _HomeViewState extends State<HomeView> {
+class _FavoritesTabState extends State<FavoritesTab> {
   PokemonStore pokemonStore = PokemonStore();
-  int index = 0;
   @override
   void initState() {
-    pokemonStore.getAllPokemon();
+    pokemonStore.getFavorites();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> screens = [
-      Observer(builder: (_) {
-        if (pokemonStore.pokemons == null) {
-          return const SpinKitThreeBounce(
-            color: Colors.green,
-            size: 20,
-          );
-        }
-        return ListView(
-          children: pokemonStore.pokemons!
-              .map((poke) => buildPokemonCard(poke))
-              .toList(),
-        );
-      }),
-      Observer(builder: (_) {
-        if (pokemonStore.pokemons == null) {
-          return const SpinKitThreeBounce(
-            color: Colors.green,
-            size: 20,
-          );
-        }
-        final List list = box.values.toList();
-        List<PokemonModel> favorites = [];
-        for (int i = 0; i < list.length; i++) {
-          favorites.add(PokemonModel(
-            name: list[i].name,
-            url: list[i].url,
-            img: list[i].img,
-            favorite: true,
-          ));
-        }
-        return FavoritesTab(favorites: favorites);
-      }),
-    ];
     return Scaffold(
       backgroundColor: Colors.green[300],
-      appBar: AppBar(),
-      body: screens[index],
-      bottomNavigationBar: NavigationBarTheme(
-        data: NavigationBarThemeData(
-            // indicatorColor: Colors.white,
-            labelTextStyle: MaterialStateProperty.all(const TextStyle())),
-        child: NavigationBar(
-          height: 60,
-          // backgroundColor: Colors.red,
-          selectedIndex: index,
-          onDestinationSelected: (index) async {
-            setState(() {
-              this.index = index;
-            });
-          },
-          destinations: [
-            NavigationDestination(
-                icon: Image.asset(
-                  'assets/images/pokemon.png',
-                  scale: 20,
-                ),
-                label: "Pokedex"),
-            NavigationDestination(
-                icon: Icon(MdiIcons.heart, color: Colors.red),
-                label: "Favorites"),
-          ],
-        ),
-      ),
+      body: listFavorites(MediaQuery.of(context).size.height * 0.8),
     );
   }
 
@@ -118,7 +61,7 @@ class _HomeViewState extends State<HomeView> {
             children: [
               // Text(poke.url!),
               CachedNetworkImage(
-                placeholder: (context, url) => SpinKitThreeBounce(
+                placeholder: (context, url) => const SpinKitThreeBounce(
                   color: Colors.green,
                   size: 20,
                 ), // Indicador de carregamento
@@ -157,5 +100,49 @@ class _HomeViewState extends State<HomeView> {
         ),
       ),
     );
+  }
+
+  listFavorites(double maxHeight) {
+    return Observer(builder: (_) {
+      if (pokemonStore.pokemons == null) {
+        return const SpinKitThreeBounce(
+          color: Colors.green,
+          size: 20,
+        );
+      }
+      return ListView(
+        children: pokemonStore.pokemons!
+            .map((poke) => PokemonCard(
+                poke: poke,
+                maxHeight: maxHeight,
+                onTap: () async {
+                  await pokemonStore.getPokemonDetails(poke);
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(
+                        builder: (context) => PokemonDetailsView(
+                            pokemon: pokemonStore.pokemonSelected),
+                      ))
+                      .then((value) => pokemonStore.getAllPokemon());
+                },
+                toggleFavorite: () {
+                  setState(() {
+                    if (poke.favorite!) {
+                      box.delete(poke.name!);
+                    } else {
+                      box.put(
+                        poke.name!,
+                        PokemonHive(
+                          name: poke.name!,
+                          url: poke.url!,
+                          img: poke.img!,
+                        ),
+                      );
+                    }
+                    poke.favorite = box.get(poke.name) != null;
+                  });
+                }))
+            .toList(),
+      );
+    });
   }
 }

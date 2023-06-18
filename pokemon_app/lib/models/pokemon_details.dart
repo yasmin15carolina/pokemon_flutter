@@ -11,7 +11,7 @@ class PokemonDetailsModel {
   String? name;
   int? order;
   List<Null>? pastTypes;
-  Ability? species;
+  ObjectRequest? species;
   Sprites? sprites;
   List<Stats>? stats;
   List<Types>? types;
@@ -64,8 +64,9 @@ class PokemonDetailsModel {
     name = json['name'];
     order = json['order'];
 
-    species =
-        json['species'] != null ? Ability.fromJson(json['species']) : null;
+    species = json['species'] != null
+        ? ObjectRequest.fromJson(json['species'])
+        : null;
     sprites =
         json['sprites'] != null ? Sprites.fromJson(json['sprites']) : null;
     if (json['stats'] != null) {
@@ -121,15 +122,16 @@ class PokemonDetailsModel {
 }
 
 class Abilities {
-  Ability? ability;
+  ObjectRequest? ability;
   bool? isHidden;
   int? slot;
 
   Abilities({this.ability, this.isHidden, this.slot});
 
   Abilities.fromJson(Map<String, dynamic> json) {
-    ability =
-        json['ability'] != null ? Ability.fromJson(json['ability']) : null;
+    ability = json['ability'] != null
+        ? ObjectRequest.fromJson(json['ability'])
+        : null;
     isHidden = json['is_hidden'];
     slot = json['slot'];
   }
@@ -145,13 +147,13 @@ class Abilities {
   }
 }
 
-class Ability {
+class ObjectRequest {
   String? name;
   String? url;
 
-  Ability({this.name, this.url});
+  ObjectRequest({this.name, this.url});
 
-  Ability.fromJson(Map<String, dynamic> json) {
+  ObjectRequest.fromJson(Map<String, dynamic> json) {
     name = json['name'];
     url = json['url'];
   }
@@ -166,14 +168,15 @@ class Ability {
 
 class GameIndices {
   int? gameIndex;
-  Ability? version;
+  ObjectRequest? version;
 
   GameIndices({this.gameIndex, this.version});
 
   GameIndices.fromJson(Map<String, dynamic> json) {
     gameIndex = json['game_index'];
-    version =
-        json['version'] != null ? Ability.fromJson(json['version']) : null;
+    version = json['version'] != null
+        ? ObjectRequest.fromJson(json['version'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -187,13 +190,13 @@ class GameIndices {
 }
 
 class Moves {
-  Ability? move;
+  ObjectRequest? move;
   List<VersionGroupDetails>? versionGroupDetails;
 
   Moves({this.move, this.versionGroupDetails});
 
   Moves.fromJson(Map<String, dynamic> json) {
-    move = json['move'] != null ? Ability.fromJson(json['move']) : null;
+    move = json['move'] != null ? ObjectRequest.fromJson(json['move']) : null;
     if (json['version_group_details'] != null) {
       versionGroupDetails = <VersionGroupDetails>[];
       json['version_group_details'].forEach((v) {
@@ -217,8 +220,8 @@ class Moves {
 
 class VersionGroupDetails {
   int? levelLearnedAt;
-  Ability? moveLearnMethod;
-  Ability? versionGroup;
+  ObjectRequest? moveLearnMethod;
+  ObjectRequest? versionGroup;
 
   VersionGroupDetails(
       {this.levelLearnedAt, this.moveLearnMethod, this.versionGroup});
@@ -226,10 +229,10 @@ class VersionGroupDetails {
   VersionGroupDetails.fromJson(Map<String, dynamic> json) {
     levelLearnedAt = json['level_learned_at'];
     moveLearnMethod = json['move_learn_method'] != null
-        ? Ability.fromJson(json['move_learn_method'])
+        ? ObjectRequest.fromJson(json['move_learn_method'])
         : null;
     versionGroup = json['version_group'] != null
-        ? Ability.fromJson(json['version_group'])
+        ? ObjectRequest.fromJson(json['version_group'])
         : null;
   }
 
@@ -294,14 +297,14 @@ class Sprites {
 class Stats {
   int? baseStat;
   int? effort;
-  Ability? stat;
+  ObjectRequest? stat;
 
   Stats({this.baseStat, this.effort, this.stat});
 
   Stats.fromJson(Map<String, dynamic> json) {
     baseStat = json['base_stat'];
     effort = json['effort'];
-    stat = json['stat'] != null ? Ability.fromJson(json['stat']) : null;
+    stat = json['stat'] != null ? ObjectRequest.fromJson(json['stat']) : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -317,13 +320,13 @@ class Stats {
 
 class Types {
   int? slot;
-  Ability? type;
+  ObjectRequest? type;
 
   Types({this.slot, this.type});
 
   Types.fromJson(Map<String, dynamic> json) {
     slot = json['slot'];
-    type = json['type'] != null ? Ability.fromJson(json['type']) : null;
+    type = json['type'] != null ? ObjectRequest.fromJson(json['type']) : null;
   }
 
   Map<String, dynamic> toJson() {
