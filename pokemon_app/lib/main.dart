@@ -9,6 +9,10 @@ Future<void> main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(PokemonHiveAdapter());
   box = await Hive.openBox<PokemonHive>('box');
+   SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown
+  ]);
   runApp(const MyApp());
 }
 
